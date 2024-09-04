@@ -1,10 +1,76 @@
 # Data Analytics 
-# Assignment 2 - BUC Algorithm and Attribute oriented induction
-# TEAM - 3
+# Assignment 2 : TEAM - 3
+# BUC Algorithm and Attribute Oriented Induction
 ```
 Abhinav Reddy Boddu - 2021101034
 Gowlapalli Rohit - 2021101113
 ```
+## Performance Analysis
+
+### A plot of minsup vs. runtime, keeping allotted memory fixed
+![Performance Analysis](time_comparision.png)
+
+The plot shows the run times for calculating unoptimized versus pruned bottom-up cube (BUC) computations at varying minimum support levels. 
+
+- **Unoptimized BUC**: The blue line represents the unoptimized algorithm, where the run time remains relatively constant around 70 seconds across different values of minimum support. This indicates that the unoptimized algorithm's performance is not significantly affected by changes in minimum support.
+
+- **Pruned BUC**: The orange line represents the BUC algorithm with pruning. The trend shows a noticeable decrease in run time as the minimum support increases. This suggests that pruning effectively reduces computation time by eliminating branches in the computation that do not meet the minimum support, leading to faster execution.
+
+- **Overall Comparison**: The pruned algorithm consistently outperforms the unoptimized version in terms of run time, especially as the minimum support threshold increases. This demonstrates the efficiency gains achieved through pruning, particularly in scenarios with higher minimum support values.
+
+### A plot of allotted memory vs. runtime, keeping minsup fixed
+![Memory Analysis](memory_comparision.png)
+
+#### Observation:
+The plot shows a consistent decrease in processing time as chunk size increases.
+
+#### Interpretation:
+- **Reduced Overhead:** Larger chunk sizes reduce the number of chunks, lowering overhead in management and processing.
+- **Improved Efficiency:** Larger chunks may enable more efficient data processing, possibly through vectorization or parallelism.
+- **No Significant Bottlenecks:** The steady downward trend suggests no major bottlenecks limiting the benefits of larger chunk sizes.
+
+#### Conclusion:
+Increasing chunk size consistently improves performance in this scenario, likely due to task nature, hardware, or algorithm efficiency. However, this conclusion may not apply universally.
+
+
+## Optimization Technique (30 marks)
+![Code Analysis](optimisation_comparision.png)
+The optimization implemented in the `buc_pruning` function involves **pruning branches** of the computation tree that cannot meet the specified `min_support`, thereby reducing unnecessary computations.
+
+#### Details of the Optimization:
+
+1. **Pruning Based on Minimum Support:**
+   - **Unoptimized `buc`:** Recursively processes all possible combinations of dimension values, regardless of their counts.
+   - **Optimized `buc_pruning`:** Before making a recursive call for a subset, it checks if the count of data points in that subset is greater than or equal to `min_support`.
+     - If the count is less, the recursive call is skipped.
+     - This check is applied to both individual dimension values and the 'ALL' aggregate.
+
+2. **Reduced Recursive Calls:**
+   - By skipping subsets with counts below `min_support`, the algorithm avoids diving deeper into branches that won't contribute to the final result.
+   - This leads to a smaller recursion tree and fewer function calls.
+
+#### Impact on Performance:
+
+- **Decreased Execution Time:**
+  - **Fewer Computations:** Pruning reduces the number of subsets the algorithm needs to evaluate.
+  - **Efficiency Gains:** Resources are focused on processing only meaningful subsets, improving overall efficiency.
+  
+- **Scalability Improvements:**
+  - **Handling Larger Datasets:** The optimized algorithm scales better with larger datasets and higher dimensionality.
+  - **Better Performance with Higher `min_support`:** As `min_support` increases, more branches are pruned, leading to greater performance gains.
+
+- **Resource Optimization:**
+  - **Memory Usage:** Reduced recursion depth can lower memory consumption.
+  - **Processing Power:** Less computational power is required due to fewer operations.
+
+#### Summary:
+
+The optimization in `buc_pruning` enhances performance by:
+
+- **Eliminating Unnecessary Computations:** Skips processing of subsets that cannot meet the `min_support`.
+- **Improving Efficiency:** Focuses on relevant data, making the algorithm faster and more resource-effective.
+- **Scaling Effectively:** Performs better with larger datasets and higher minimum support thresholds compared to the unoptimized version.
+
 
 ## Comparison of BUC and AOI
 
@@ -162,12 +228,47 @@ Gowlapalli Rohit - 2021101113
   - **Use Case**: AOI can serve as a preprocessing step for other data mining techniques, where generalizing the data helps to reduce its complexity and enhance the performance of subsequent analyses.
   - **Example**: Before applying a clustering algorithm to customer purchase data, AOI can be used to generalize purchase amounts and product categories, leading to more meaningful and interpretable clusters.
 
-### Summary
+#### Summary
 - **BUC** is preferable when detailed, multi-dimensional aggregation is needed, especially in sparse datasets or when performing OLAP tasks.
 - **AOI** is more suitable for scenarios requiring high-level summaries, conceptual insights, and simplified data interpretation, particularly when communicating with non-technical audiences or as a preprocessing step for further analysis.
 
 
+### Concrete Examples from Implementations
 
+#### a. Primary Purposes and Use Cases
+- **BUC Algorithm**:
+  - *Example*: In the `iceberg_apriori` function, BUC aggregates data across dimensions like `Electric Vehicle Type`, `Electric Utility`, and `Model Year`, revealing patterns in vehicle sales.
+
+- **AOI**:
+  - *Example*: The `Generalizer` class categorizes data, e.g., `generalize_range` groups `Electric Range` into 'Short', 'Medium', and 'Long Range', aiding in understanding overall trends.
+
+#### b. Types of Insights or Patterns
+- **BUC**:
+  - *Example*: `get_candidate_itemsets` finds frequent combinations, e.g., `BEV` vehicles with `Long Range` in specific regions, highlighting significant data patterns.
+
+- **AOI**:
+  - *Example*: By generalizing continuous values, e.g., `Electric Range`, AOI helps identify broader consumer preferences, such as a majority falling into the 'Medium Range' category.
+
+#### c. Computational Efficiency and Scalability
+- **BUC**:
+  - *Example*: The `buc_pruning` technique skips itemsets below the minimum support, optimizing efficiency and reducing computation in large datasets.
+
+- **AOI**:
+  - *Example*: `remove_unused_fields` drops irrelevant columns, reducing dataset complexity, making generalization faster and more scalable.
+
+#### d. Interpretability of Results
+- **BUC**:
+  - *Example*: BUC results, such as frequent itemsets of `BEV` and `Long Range`, are straightforward for business analysts to interpret and act upon.
+
+- **AOI**:
+  - *Example*: Simplifying `Electric Vehicle Type` into `BEV` and `PHEV` categories in AOI makes data easier to understand and communicate.
+
+#### e. Scenarios for Preference
+- **BUC**:
+  - *Example*: Prefer BUC for detailed analysis, e.g., exploring popular combinations of vehicle type and range over different years.
+
+- **AOI**:
+  - *Example*: Choose AOI for identifying broad trends, such as general sales periods by categorizing `Model Year`.
 
 
 
